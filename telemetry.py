@@ -6,11 +6,8 @@ df = pd.read_csv(r"C:\dev\Virtual-Telemetry-Software\telem3.csv")
 
 print(df.columns)
 
-'''df["SuspensionTravelMetersFrontLeft"] = df["SuspensionTravelMetersFrontLeft"]/10000 
-df["SuspensionTravelMetersFrontRight"] = df["SuspensionTravelMetersFrontRight"]/10000 
-df["SuspensionTravelMetersRearLeft"] = df["SuspensionTravelMetersRearLeft"]/10000 
-df["SuspensionTravelMetersRearRight"] = df["SuspensionTravelMetersRearRight"]/10000 
-'''
+
+df["Gear"] = df["Gear"].clip(1,6)
 fig, axs = plt.subplots(2,2, figsize=(16, 8))
 
 axs[0,0].plot(df["TimestampMS"],df["SuspensionTravelMetersFrontLeft"])
@@ -49,20 +46,29 @@ axs1[0,1].set_title('Speed')
 axs1[0,1].set_ylabel('m/s')
 axs1[0,1].set_xlabel('Time [ms]')
 
-axs1[1,0].plot(df["TimestampMS"],df["Accelerator"])
-axs1[1,0].set_title('Accelerator')
-axs1[1,0].set_ylabel('Value')
-axs1[1,0].set_xlabel('Time [ms]')
 
-axs1[1,1].plot(df["TimestampMS"],df["Torque"])
-axs1[1,1].set_title('Torque')
-axs1[1,1].set_ylabel('Nm')
+axs1[1,0].plot(df["TimestampMS"],df["Torque"], label='Torque')
+axs1[1,0].plot(df["TimestampMS"],df["CurrentEngineRpm"], label='CurrentEngineRpm')
+axs1[1,0].set_title('Torque - RPM')
+axs1[1,0].set_ylabel('Comparison')
+axs1[1,0].set_xlabel('Time [ms]')
+axs1[1,0].legend()
+
+axs1[1,1].plot(df["TimestampMS"],df["Gear"], label='Gear')
+axs1[1,1].plot(df["TimestampMS"],df["Torque"]/max(df["Torque"]), label='Torque')
+axs1[1,1].plot(df["TimestampMS"],df["CurrentEngineRpm"]/((max(df["CurrentEngineRpm"]))/2), label='CurrentEngineRpm')
+axs1[1,1].set_title('Torque - RPM')
+axs1[1,1].set_ylabel('Comparison')
 axs1[1,1].set_xlabel('Time [ms]')
+axs1[1,1].legend()
 
 plt.plot()
 plt.show()
 
 plt.plot(df["PositionX"], df["PositionY"])
+plt.show()
+
+plt.plot(df["TimestampMS"], df["Gear"])
 plt.show()
 
 
