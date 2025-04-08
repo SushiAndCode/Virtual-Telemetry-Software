@@ -38,15 +38,13 @@ with dpg.window(label="Tutorial", width=400, height=400):
         dpg.add_plot_axis(dpg.mvXAxis, label="x")
         dpg.add_plot_axis(dpg.mvYAxis, label="y", tag="yaxis")
 
-        # series 1
         dpg.add_line_series(df["TimestampMS"].to_list(), df["Gear"].to_list(), label="Gear", parent="yaxis", tag="GearTag")
         dpg.add_button(label="Delete Gear", parent=dpg.last_item(), callback=lambda: dpg.delete_item("Gear"))
 
-        # series 2
         dpg.add_line_series(df["TimestampMS"].to_list(), df["Torque"].to_list(), label="Torque", parent="yaxis", tag="TorqueTag")
         dpg.add_button(label="Delete Torque", parent=dpg.last_item(), callback=lambda: dpg.delete_item("Torque"))
 
-        dpg.add_line_series(df["TimestampMS"].to_list(), df["CurrentEngineRpm"].to_list(), label="CurrentEngineRpm", parent="yaxis", tag="CurrentEngineRpmTag")
+        dpg.add_line_series(df["TimestampMS"].to_list(), df["CurrentEngineRpm"].to_list(),label="CurrentEngineRpm", parent="yaxis", tag="CurrentEngineRpmTag")
         dpg.add_button(label="Delete CurrentEngineRpm", parent=dpg.last_item(), callback=lambda: dpg.delete_item("CurrentEngineRpm"))
 
 dpg.create_viewport(title='Custom Title', width=800, height=600)

@@ -1,48 +1,37 @@
 import dearpygui.dearpygui as dpg
-from math import sin
-
+# DearPyGui setup
 dpg.create_context()
+line_series_data = {
+    "Line A": "line_series_a",
+    "Line B": "line_series_b",
+    "Line C": "line_series_c"
+}
 
-sindatax = []
-sindatay = []
-for i in range(0, 100):
-    sindatax.append(i / 100)
-    sindatay.append(0.5 + 0.5 * sin(50 * i / 100))
+with dpg.window(label="Demo", width=600, height=400):
+    
+    def toggle_line_series(sender, app_data, user_data):
+        
+        if dpg.is_item_shown(user_data):
+            dpg.hide_item(user_data)
+        else:
+            dpg.show_item(user_data)
 
-with dpg.window(label="Tutorial", width=400, height=600):
-    dpg.add_text("Click and drag the middle mouse button over the top plot!")
+    # Menu bar
+    with dpg.menu_bar():
+        with dpg.menu(label="Edit"):
+            for label, tag in line_series_data.items():
+                print(tag)
+                print(type(tag))
+                dpg.add_menu_item(label = label, callback=toggle_line_series, user_data=tag)
 
-
-    def query(sender, app_data, user_data):
-        # Get zoomed region limits
-        x_max, x_min = app_data[0][0], app_data[0][1]
-        y_max, y_min = app_data[0][2], app_data[0][3]
-
-        # Update the axis limits in second plot
-        dpg.set_axis_limits("xaxis_tag2", x_min, x_max)
-        dpg.set_axis_limits("yaxis_tag2", y_min, y_max)
-
-        # Filter data within zoom range
-        zoomed_x = [x for x in sindatax if x_min <= x <= x_max]
-        zoomed_y = [y for x, y in zip(sindatax, sindatay) if x_min <= x <= x_max]
-
-        print(zoomed_x)
-        print(zoomed_y)
-
-        # Update the second plot line series
-        dpg.set_value("zoomed_line", [zoomed_x, zoomed_y])
-
-
-    with dpg.plot(no_title=True, height=200, callback=query, query=True, no_menus=True, width=-1):
-        dpg.add_plot_axis(dpg.mvXAxis, label="x")
-        dpg.add_plot_axis(dpg.mvYAxis, label="y")
-        dpg.add_line_series(sindatax, sindatay, parent=dpg.last_item())
-
-    # plot 2
-    with dpg.plot(no_title=True, height=200, no_menus=True, width=-1):
-        dpg.add_plot_axis(dpg.mvXAxis, label="x1", tag="xaxis_tag2")
-        dpg.add_plot_axis(dpg.mvYAxis, label="y1", tag="yaxis_tag2")
-        dpg.add_line_series([], [], tag="zoomed_line", parent="yaxis_tag2")
+    # Plot area
+    with dpg.plot(label="My Plot", height=300, width=500):
+        dpg.add_plot_legend()
+        dpg.add_plot_axis(dpg.mvXAxis, label="X Axis")
+        with dpg.plot_axis(dpg.mvYAxis, label="Y Axis"):
+            for label, tag in line_series_data.items():
+                dpg.add_line_series([0, 1, 2, 3], [0, 1, 4, 9], label=label, tag=tag)
+                dpg.hide_item(tag)
 
 dpg.create_viewport(title='Custom Title', width=800, height=600)
 dpg.setup_dearpygui()
