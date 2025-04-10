@@ -21,14 +21,14 @@ df["Gear"] = df["Gear"].apply(lambda x: np.nan if x > 6 else x)
 min_x = int(df["TimestampMS"].min())
 max_x = int(df["TimestampMS"].max())
 
-tick_interval = 30000 
+tick_interval = 5000 
 custom_ticks = list(range(min_x, max_x + 1, tick_interval))
 tick_labels = [ms_to_mmss(ms) for ms in custom_ticks]
 ticks = tuple(zip(tick_labels, custom_ticks))
 
-with dpg.window(label="Signal Viewer",width=1000, height=600):
+with dpg.window(label="Telemetry Viewer",width=1000, height=600):
     
-    dpg.add_text("Jijjino")
+    dpg.add_text("Telemetry Viewer")
 
     def toggle_line_series(sender, app_data, user_data):
         if dpg.is_item_shown(user_data):
@@ -37,13 +37,12 @@ with dpg.window(label="Signal Viewer",width=1000, height=600):
             dpg.show_item(user_data)
 
     with dpg.menu_bar():
-
         with dpg.menu(label="Channels"):
             for tag in df.columns:
                 if tag != "TimestampMS":
                     dpg.add_menu_item(label = tag,callback=toggle_line_series, user_data=tag)
 
-    with dpg.plot(label="Main Plot",height=-1, width=-1):
+    with dpg.plot(label="Telemetry",height=400, width=-1):
         dpg.add_plot_legend()
         dpg.add_plot_axis(dpg.mvXAxis, label="TimestampMS", tag="main_x_axis")
         dpg.set_axis_ticks("main_x_axis", ticks)
@@ -52,7 +51,17 @@ with dpg.window(label="Signal Viewer",width=1000, height=600):
                 if channel != "TimestampMS":
                     dpg.add_line_series(df["TimestampMS"].to_list(), df[channel].to_list(),label = channel ,tag=channel)
                     dpg.hide_item(channel)
-    
+
+    with dpg.plot(label = "Track",height=400, width=-1, tag="track_plot"):
+        
+        dpg.add_plot_axis(dpg.mvXAxis, label="X position", tag = "positionX")
+        with dpg.plot_axis(dpg.mvYAxis, label="Y position", tag="positionY"):
+            dpg.add_line_series(df["PositionX"].tolist(), df["PositionY"].tolist(), parent="positionY", label="Plotted Track")
+
+        # Automatically adjust axis limits to fit the data
+        dpg.set_axis_limits_auto("positionX")
+        dpg.set_axis_limits_auto("positionY")
+
 
 if __name__ == "__main__":
     dpg.create_viewport(title='Custom Title', width=800, height=600)
