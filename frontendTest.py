@@ -36,11 +36,37 @@ with dpg.window(label="Telemetry Viewer",width=1000, height=600):
         else:
             dpg.show_item(user_data)
 
+    def on_mouse_move(sender, app_data):
+
+        mouse_x, mouse_y = dpg.get_plot_mouse_pos()
+        if not np.isnan(mouse_x) and not np.isinf(mouse_x):
+            idx = (np.abs(df["TimestampMS"] - mouse_x)).idxmin()
+            pos_x = df.iloc[idx]["PositionX"]
+            pos_y = df.iloc[idx]["PositionY"]
+            dpg.set_value("cursor_dot", [[pos_x], [pos_y]])
+
+    def normalize_series_callback(sender, app_data, user_data):
+        # Normalize each series (except timestamp)
+        timestamps = df["TimestampMS"].to_list()
+        for channel in df.columns:
+            if channel != "TimestampMS":
+                data = df[channel].to_list()
+                min_val = min(data)
+                max_val = max(data)
+                # Avoid division by zero
+                if max_val - min_val == 0:
+                    normalized = [0] * len(data)
+                else:
+                    normalized = [(x - min_val) / (max_val - min_val) for x in data]
+                dpg.set_value(channel, [timestamps, normalized])
+
     with dpg.menu_bar():
         with dpg.menu(label="Channels"):
             for tag in df.columns:
                 if tag != "TimestampMS":
                     dpg.add_menu_item(label = tag,callback=toggle_line_series, user_data=tag)
+
+        dpg.add_menu_item(label="Normalize Channels", callback=normalize_series_callback)
 
     with dpg.plot(label="Telemetry",height=400, width=-1):
         dpg.add_plot_legend()
@@ -58,9 +84,15 @@ with dpg.window(label="Telemetry Viewer",width=1000, height=600):
         with dpg.plot_axis(dpg.mvYAxis, label="Y position", tag="positionY"):
             dpg.add_line_series(df["PositionX"].tolist(), df["PositionY"].tolist(), parent="positionY", label="Plotted Track")
 
+            dpg.add_scatter_series(
+                [], [], label="Cursor Dot", parent="positionY", tag="cursor_dot"
+            )
         # Automatically adjust axis limits to fit the data
         dpg.set_axis_limits_auto("positionX")
         dpg.set_axis_limits_auto("positionY")
+
+    with dpg.handler_registry():
+        dpg.add_mouse_move_handler(callback=on_mouse_move)
 
 
 if __name__ == "__main__":
