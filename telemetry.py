@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv(r"C:\dev\Virtual-Telemetry-Software\telem4.csv")
+df = pd.read_csv(r"C:\dev\Virtual-Telemetry-Software\telem5.csv")
 #df = df.dropna(axis=1, how='all')
 
 print(df.columns)
 
 df["Gear"] = df["Gear"].apply(lambda x: np.nan if x > 6 else x)
+
 
 fig1, axs1 = plt.subplots(1,figsize=(16, 8))
 
@@ -63,15 +64,16 @@ axs1[1,0].set_ylabel('Comparison')
 axs1[1,0].set_xlabel('Time [ms]')
 axs1[1,0].legend()
 
-
 plt.plot()
 plt.show()
 
-plt.plot(df["PositionX"], df["PositionY"])
+
+
+data = list(np.array((df['PositionX'].values, df['PositionZ'].values, df['PositionY'].values)))
+plt.plot(data[:][0], data[:][1])
 plt.show()
 
-plt.plot(df["TimestampMS"], df["Gear"])
-plt.show()
+
 
 
 

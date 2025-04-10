@@ -11,12 +11,12 @@ def ms_to_mmss(ms):
     sec = seconds % 60
     return f"{int(minutes):02}:{int(sec):02}"
 
-df = pd.read_csv(r"C:\dev\Virtual-Telemetry-Software\telem3.csv")
+df = pd.read_csv(r"C:\dev\Virtual-Telemetry-Software\telem5.csv")
 
 df["TimestampMS"] = pd.to_numeric(df["TimestampMS"], errors="coerce")
 df["TimestampMS"] = df["TimestampMS"] - min(df["TimestampMS"])
 df.dropna(subset=["TimestampMS"], inplace=True)
-df["Gear"] = df["Gear"].apply(lambda x: np.nan if x > 6 else x)
+df["Gear"] = df["Gear"].apply(lambda x: np.nan if x == 11 else x)
 
 min_x = int(df["TimestampMS"].min())
 max_x = int(df["TimestampMS"].max())
@@ -42,7 +42,7 @@ with dpg.window(label="Telemetry Viewer",width=1000, height=600):
         if not np.isnan(mouse_x) and not np.isinf(mouse_x):
             idx = (np.abs(df["TimestampMS"] - mouse_x)).idxmin()
             pos_x = df.iloc[idx]["PositionX"]
-            pos_y = df.iloc[idx]["PositionY"]
+            pos_y = df.iloc[idx]["PositionZ"]
             dpg.set_value("cursor_dot", [[pos_x], [pos_y]])
 
     def normalize_series_callback(sender, app_data, user_data):
@@ -82,7 +82,7 @@ with dpg.window(label="Telemetry Viewer",width=1000, height=600):
         
         dpg.add_plot_axis(dpg.mvXAxis, label="X position", tag = "positionX")
         with dpg.plot_axis(dpg.mvYAxis, label="Y position", tag="positionY"):
-            dpg.add_line_series(df["PositionX"].tolist(), df["PositionY"].tolist(), parent="positionY", label="Plotted Track")
+            dpg.add_line_series(df["PositionX"].tolist(), df["PositionZ"].tolist(), parent="positionY", label="Plotted Track")
 
             dpg.add_scatter_series(
                 [], [], label="Cursor Dot", parent="positionY", tag="cursor_dot"
