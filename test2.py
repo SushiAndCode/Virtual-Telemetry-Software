@@ -1,39 +1,20 @@
 import dearpygui.dearpygui as dpg
-# DearPyGui setup
+import pandas as pd
+
+def file_selected_callback(sender, app_data):
+    print("Selected file:", app_data['file_path_name'])
+    df = pd.read_csv(app_data['file_path_name'])
+    print(df)
+
 dpg.create_context()
-line_series_data = {
-    "Line A": "line_series_a",
-    "Line B": "line_series_b",
-    "Line C": "line_series_c"
-}
 
-with dpg.window(label="Demo", width=600, height=400):
-    
-    def toggle_line_series(sender, app_data, user_data):
-        
-        if dpg.is_item_shown(user_data):
-            dpg.hide_item(user_data)
-        else:
-            dpg.show_item(user_data)
+with dpg.file_dialog(directory_selector=False, show=False, callback=file_selected_callback, id="file_dialog_id"):
+    dpg.add_file_extension(".csv")
 
-    # Menu bar
-    with dpg.menu_bar():
-        with dpg.menu(label="Edit"):
-            for label, tag in line_series_data.items():
-                print(tag)
-                print(type(tag))
-                dpg.add_menu_item(label = label, callback=toggle_line_series, user_data=tag)
+with dpg.window(label="Main Window"):
+    dpg.add_button(label="Select File", callback=lambda: dpg.show_item("file_dialog_id"))
 
-    # Plot area
-    with dpg.plot(label="My Plot", height=300, width=500):
-        dpg.add_plot_legend()
-        dpg.add_plot_axis(dpg.mvXAxis, label="X Axis")
-        with dpg.plot_axis(dpg.mvYAxis, label="Y Axis"):
-            for label, tag in line_series_data.items():
-                dpg.add_line_series([0, 1, 2, 3], [0, 1, 4, 9], label=label, tag=tag)
-                dpg.hide_item(tag)
-
-dpg.create_viewport(title='Custom Title', width=800, height=600)
+dpg.create_viewport(title="File Picker Example", width=600, height=300)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
