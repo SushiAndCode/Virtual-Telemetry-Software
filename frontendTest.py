@@ -94,6 +94,7 @@ with dpg.window(label="Telemetry Viewer",width=1000, height=600):
             if channel != "TimestampMS":
                 data = df[channel].to_list()
                 dpg.set_value(channel, [df["TimestampMS"].to_list(), data])
+            
 
     with dpg.menu_bar():
         with dpg.menu(label="Channels"):
@@ -106,22 +107,30 @@ with dpg.window(label="Telemetry Viewer",width=1000, height=600):
 
         dpg.add_menu_item(label = "Load File", callback=lambda: dpg.show_item("file_dialog_id"))
 
-    with dpg.plot(label="Telemetry",height=400, width=-1, tag = "Main Plot"):
-        dpg.add_plot_legend()
-        dpg.add_plot_axis(dpg.mvXAxis, label="TimestampMS", tag="main_x_axis")
-        with dpg.plot_axis(dpg.mvYAxis, label="Amplitude", tag="main_y_axis"):
-            pass
+    with dpg.group(horizontal=True):
 
-    with dpg.plot(label = "Track",height=400, width=-1, tag="track_plot"):
-        dpg.add_plot_axis(dpg.mvXAxis, label="X position", tag = "positionX")
-        with dpg.plot_axis(dpg.mvYAxis, label="Y position", tag="positionY"):
-            
-            dpg.add_scatter_series(
-                [], [], label="Cursor Dot", parent="positionY", tag="cursor_dot"
-            )
-        # Automatically adjust axis limits to fit the data
-        dpg.set_axis_limits_auto("positionX")
-        dpg.set_axis_limits_auto("positionY")
+        with dpg.child_window(width=200, autosize_y=True, border=True):
+            dpg.add_text("Channel Visibility")
+            for i in range(5):  # Example: 5 checkboxes
+                dpg.add_checkbox(label=f"Channel {i+1}", callback=lambda s,a,u=i: print(f"Toggled Channel {u+1}"))
+
+        with dpg.group():
+            with dpg.plot(label="Telemetry",height=400, width=-1, tag = "Main Plot"):
+                dpg.add_plot_legend()
+                dpg.add_plot_axis(dpg.mvXAxis, label="TimestampMS", tag="main_x_axis")
+                with dpg.plot_axis(dpg.mvYAxis, label="Amplitude", tag="main_y_axis"):
+                    pass
+
+            with dpg.plot(label = "Track",height=400, width=-1, tag="track_plot"):
+                dpg.add_plot_axis(dpg.mvXAxis, label="X position", tag = "positionX")
+                with dpg.plot_axis(dpg.mvYAxis, label="Y position", tag="positionY"):
+                    
+                    dpg.add_scatter_series(
+                        [], [], label="Cursor Dot", parent="positionY", tag="cursor_dot"
+                    )
+                # Automatically adjust axis limits to fit the data
+                dpg.set_axis_limits_auto("positionX")
+                dpg.set_axis_limits_auto("positionY")
 
     with dpg.handler_registry():
         dpg.add_mouse_move_handler(callback=on_mouse_move)
