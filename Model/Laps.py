@@ -15,7 +15,7 @@ class Laps():
 
     def getCustomTimeUnits(self, tick_interval):
 
-        self.df["TimestampMS"] = pd.to_numeric(self.dfdf["TimestampMS"], errors="coerce")
+        self.df["TimestampMS"] = pd.to_numeric(self.df["TimestampMS"], errors="coerce")
         self.df["TimestampMS"] = self.df["TimestampMS"] - min(self.df["TimestampMS"])
         self.df.dropna(subset=["TimestampMS"], inplace=True)
         self.df["Gear"] = self.df["Gear"].apply(lambda x: np.nan if x == 11 else x)
@@ -26,5 +26,6 @@ class Laps():
         custom_ticks = list(range(min_x, max_x + 1, tick_interval))
         tick_labels = [ms_to_mmss(ms) for ms in custom_ticks]
         self.ticks = tuple(zip(tick_labels, custom_ticks))
+        return self.ticks
 
 
