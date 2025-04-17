@@ -58,8 +58,6 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=file_selecte
     
 with dpg.window(label="Telemetry Viewer",width=1000, height=600):
     
-    dpg.add_text("Telemetry Viewer")
-
     def toggle_line_series(sender, app_data, user_data):
         if dpg.is_item_shown(user_data):
             dpg.hide_item(user_data)
